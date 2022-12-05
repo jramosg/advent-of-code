@@ -18,8 +18,7 @@
       (fn [[range-min range-max :as interval]]
         (every?
           (fn [[oth-min oth-max]]
-            (and (<= oth-min range-min oth-max)
-                 (<= oth-min range-max oth-max)))
+            (<= oth-min range-min range-max oth-max))
           (remove (set interval) elf-data)))
       elf-data)))
 
@@ -28,18 +27,20 @@
        (filter single-elf-repeated-assignment?)
        count))
 
-(defn str->range-intervals [elf-str-data]
-  (map
-    (fn [s]
-      (let [[start end] (read-dashed-interval s)]
-        (range start (inc end))))
-    (str/split elf-str-data #",")))
+(defn- partialy-contains? [[int1-min int1-max] [int2-min int2-max]]
+  (or (<= int2-min int1-min int2-max)
+      (<= int2-min int1-max int2-max)
+      (<= int1-min int2-min int1-max)
+      (<= int1-min int2-max int1-max)))
 
 (defn- sinle-elf-overlaping-assigment-pair? [elf-str-data]
-  (->> (str->range-intervals elf-str-data)
-       flatten
-       frequencies
-       (some (fn [[_ f]] (> f 1)))))
+  (let [elf-data (str->int-intervals elf-str-data)]
+    (some
+      (fn [interval]
+        (every?
+          #(partialy-contains? interval %)
+          (remove (set interval) elf-data)))
+      elf-data)))
 
 (defn count-overlaping-assigment-pairs [& [input-data]]
   (->> (or input-data (util/slurp+split-line "04"))
