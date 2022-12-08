@@ -15,11 +15,11 @@
         (recur (rest data) ["/"] data #{})
 
         (= input-line "$ cd ..")
-        (recur (rest data) (drop-last dir) dir-sizes (conj dirs (drop-last dir)))
+        (recur (rest data) (pop dir) dir-sizes (conj dirs (pop dir)))
 
         (str/starts-with? input-line "$ cd")
-        (recur (rest data) (conj (vec dir) (subs input-line 5)) dir-sizes
-               (conj dirs (conj (vec dir) (subs input-line 5))))
+        (let [new-dir (conj dir (subs input-line 5))]
+          (recur (rest data) new-dir dir-sizes (conj dirs new-dir)))
 
         (str/starts-with? input-line "$ ls")
         (recur (rest data) dir dir-sizes dirs)
@@ -38,11 +38,6 @@
           dirs))
       {:dir-tree dir-sizes
        :dirs dirs})))
-
-(defn- sum-dir [dir subdir-or-size]
-  (if (number? subdir-or-size)
-    subdir-or-size
-    (sum-dir (conj dir) subdir-or-size)))
 
 (defn- sum [ns]
   (reduce + ns))
