@@ -5,13 +5,13 @@
   (some-> c (Character/digit 10)))
 
 (defn- in-edge? [data row-i col-i]
-  (some nil?
-        (map (fn [coll]
-               (get-in data coll))
-             [[row-i (dec col-i)]
-              [row-i (inc col-i)]
-              [(dec row-i) col-i]
-              [(inc row-i) col-i]])))
+  (not-every?
+    (fn [coll]
+      (get-in data coll))
+    [[row-i (dec col-i)]
+     [row-i (inc col-i)]
+     [(dec row-i) col-i]
+     [(inc row-i) col-i]]))
 
 (defn- smaller? [data cell-int row-i col-i]
   (< (char->int (get-in data [row-i col-i]))
@@ -92,9 +92,9 @@
 (defn- num-visibles [c data row-i col-i cols-in-row row-count]
   (let [cell-int (char->int c)]
     [(count-visibles-in-row data cell-int row-i (range (inc col-i) cols-in-row))
-     (count-visibles-in-row data cell-int row-i (reverse (range col-i)))
+     (count-visibles-in-row data cell-int row-i (range (dec col-i) -1 -1))
      (count-visibles-in-col data cell-int col-i (range (inc row-i) row-count))
-     (count-visibles-in-col data cell-int col-i (reverse (range row-i)))]))
+     (count-visibles-in-col data cell-int col-i (range (dec row-i) -1 -1))]))
 
 (defn- get-scenic-score [[row1 :as data]]
   (let [cols-count (count row1)
