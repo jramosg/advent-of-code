@@ -1,4 +1,4 @@
-# advent-of-code
+# Advent of Code - Clojure
 
 Solutions of [Advent of Code](https://adventofcode.com/) written in **Clojure**
 
