@@ -2,7 +2,7 @@
   (:require [advent-of-code.util :as util]
             [clojure.string :as str]))
 
-(def ^:private ^:constant cycles-by-act-map
+(def ^:private ^:const cycles-by-act-map
   {"noop" 1
    "addx" 2})
 
