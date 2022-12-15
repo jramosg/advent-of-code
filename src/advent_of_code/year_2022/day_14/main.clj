@@ -52,16 +52,19 @@
   (and (<= min-x new-posx max-x)
        (<= min-y new-posy max-y)))
 
+(defn- get-next-position [position applies-fn]
+  (some
+    (fn [delta]
+      (let [new-pos (apply-delta position delta)]
+        (when (applies-fn new-pos)
+          new-pos)))
+    deltas))
+
 (defn- get-resting-point
   [{:keys [rocks sand] :as state} position grids]
   (when (in-grid? position grids)
-    (let [new-pos (some
-                    (fn [delta]
-                      (let [new-pos (apply-delta position delta)]
-                        (when-not (or (rocks new-pos)
-                                      (sand new-pos))
-                          new-pos)))
-                    deltas)]
+    (let [new-pos (get-next-position position
+                                     #(or (rocks %) (sand %)))]
       (if new-pos
         (get-resting-point state new-pos grids)
         position))))
@@ -93,28 +96,30 @@
 
 (defn- get-resting-point2
   [{:keys [rocks sand] :as state} position floor]
-  (let [new-pos (some
-                  (fn [delta]
-                    (let [[_ y :as new-pos] (apply-delta position delta)]
-                      (when (and (not (rocks new-pos))
-                                 (not (sand new-pos))
-                                 (< y floor))
-                        new-pos)))
-                  deltas)]
+  (let [new-pos (get-next-position
+                  position
+                  (fn [[_ y :as xy]]
+                    (and (not (rocks xy))
+                         (not (sand xy))
+                         (< y floor))))]
     (if new-pos
       (get-resting-point2 state new-pos floor)
       position)))
 
 (defn drop-sand2 [blocked-coords floor]
-  (loop [state {:rocks (conj blocked-coords [500 0])
+  (loop [state {:rocks blocked-coords
                 :sand #{}}]
     (let [resting-point (get-resting-point2 state start-coord floor)]
       (if (= start-coord resting-point)
-        (-> state :sand count inc)
+        (-> state
+            :sand
+            count
+            inc)
         (recur (update state :sand conj resting-point))))))
 
 (defn part-2 [& [data]]
   (let [data (or data (util/slurp+split-line "14"))
-        rock-positions (rock-blocked-coords data)
-        floor (-> (find-grids rock-positions) :max-y (+ 2))]
-    (drop-sand2 rock-positions floor)))
+        rock-positions (rock-blocked-coords data)]
+    (drop-sand2 rock-positions (-> (find-grids rock-positions)
+                                   :max-y
+                                   (+ 2)))))
