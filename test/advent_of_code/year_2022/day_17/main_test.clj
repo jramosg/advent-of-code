@@ -11,6 +11,4 @@
 
 (deftest part-1-test
   (is (= 3068 (year-2022.day-17/part-1 sample-data)))
-  (is (= 3127 (year-2022.day-17/part-1 ))))
-
-(run-tests)
+  (is (= 3127 (year-2022.day-17/part-1))))
