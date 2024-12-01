@@ -9,5 +9,10 @@
        slurp
        str/split-lines))
 
+(defn read-input [year day]
+  (-> (format "src/advent_of_code/year_%s/day_%s/input.txt" year day)
+      slurp
+      str/split-lines))
+
 (defn str->int [s]
   (Integer/parseInt s))
