@@ -5,12 +5,13 @@
   (->> (if test?
          "/example-input.txt"
          "/input.txt")
-       (str "src/advent_of_code/year_2022/day_" day-str )
+       (str "src/advent_of_code/year_2022/day_" day-str)
        slurp
        str/split-lines))
 
-(defn read-input [year day]
-  (-> (format "src/advent_of_code/year_%s/day_%s/input.txt" year day)
+(defn read-input [year day & [dummy?]]
+  (-> (format "resources/inputs/%s/day%s%s.txt"
+              year day (if dummy? "-dummy" ""))
       slurp
       str/split-lines))
 

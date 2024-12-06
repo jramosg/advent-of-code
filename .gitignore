@@ -16,3 +16,4 @@ advent-of-code.iml
 .calva/
 .lsp/
 .clj-kondo/.cache
+resources/inputs
